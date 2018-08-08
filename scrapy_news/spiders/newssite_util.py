@@ -19,8 +19,9 @@ class AccessInfo:
   save_article: method to save article
   """
 
-  def __init__(self, year, month, day, no_days, end_date, url, domain_name,
-               get_page_info, check_url, save_article):
+  def __init__(self, year, month, day, no_days, end_date, allowed_start_date,
+               allowed_end_date, url, domain_name, get_page_info, check_url,
+               dir_name, save_article):
     self.year = year
     self.month = month
     self.day = day
@@ -28,6 +29,9 @@ class AccessInfo:
 
     self.start_date = int(get_date_format(year, month, day))
     self.end_date = end_date
+
+    self.allowed_start_date = allowed_start_date
+    self.allowed_end_date = allowed_end_date
 
     self.url = url
 
@@ -39,6 +43,8 @@ class AccessInfo:
 
     self.get_page_info = get_page_info
     self.save_article = save_article
+
+    self.dir_name = dir_name
 
     self.check_url = check_url
 
@@ -55,7 +61,7 @@ def nytimes_url(url):
     index += 1
 
   if index + 1 >= len(url):
-    return True
+    return False
 
   path = url[index + 1:]
   for s in accepted_sufs:
@@ -89,6 +95,7 @@ def nytimes_page_info(page, url):
   is_proper_page = False
   pub_date_home = None
   is_article = False
+  page_type = None
   pub_date = None
 
   soup = BeautifulSoup(page, "lxml")
@@ -114,17 +121,21 @@ def nytimes_page_info(page, url):
 
   if not is_proper_page:
     print_thread('page {} is not proper'.format(url))
-    return soup, False, None, False, None
+    return soup, False, None, False, None, None
 
   # check whether page is article
   meta_articleid_tag = soup.find('meta', attrs={'name': 'articleid'})
   if meta_articleid_tag is not None:
     is_article = True
+    page_type = 'article'
 
   if not is_article:
     meta_pt_tag = soup.find('meta', attrs={'name': 'PT'})
-    if meta_pt_tag is not None and meta_pt_tag['content'].lower() == 'article':
+    if meta_pt_tag is not None and (meta_pt_tag['content'].lower() == 'article'
+                                    or
+                                    meta_pt_tag['content'].lower() == 'blogs'):
       is_article = True
+      page_type = meta_pt_tag['content'].lower()
 
   # date = soup.find('div', id='date')
   # if date is None:
@@ -150,7 +161,7 @@ def nytimes_page_info(page, url):
         pub_date = int(meta_pdate_tag['content'])
 
     if pub_date is None:
-      is_article = False
+      # is_article = False
       print_thread('{} is not article (cannot find pub date)'.format(url))
 
   # check publish date of home page if it is proper page and not article
@@ -172,13 +183,13 @@ def nytimes_page_info(page, url):
               pub_date_home = None
 
   if is_article:
-    return soup, is_proper_page, pub_date_home, is_article, pub_date
+    return soup, is_proper_page, pub_date_home, is_article, page_type, pub_date
   else:
     print_thread('url {} is not article'.format(url))
-    return soup, is_proper_page, pub_date_home, is_article, None
+    return soup, is_proper_page, pub_date_home, is_article, page_type, None
 
 
-def save_article(page, pub_date, addr, article_name):
+def save_article(page, pub_date, addr, dir_name, article_name):
   """
   page: is an article
   pub_date: (string)
@@ -190,6 +201,6 @@ def save_article(page, pub_date, addr, article_name):
 
   # print(article_name)
   # os.makedirs(os.path.dirname(article_name), exist_ok=True)
-  with open('./articles/{}'.format(article_name), 'w+') as f:
+  with open('{}/{}'.format(dir_name, article_name), 'w+') as f:
     # TODO write only the story of the page
     f.write(page)

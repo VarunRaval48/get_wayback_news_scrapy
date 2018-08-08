@@ -93,7 +93,7 @@ def is_url_proper(url, r_url, access_info):
     # check whether redirected url's snapshot is before start date or after
     # only see if its after start date
     # TODO see if it has to be after cur snap
-    if snap_date < access_info.start_date:
+    if snap_date < access_info.allowed_start_date:
       print_thread("response url's snap is out of range {}".format(r_url))
       return False
 

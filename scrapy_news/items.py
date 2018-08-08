@@ -19,5 +19,6 @@ class PageItem(scrapy.Item):
   snap = scrapy.Field()
   addr = scrapy.Field()
   page = scrapy.Field()
+  page_type = scrapy.Field()
   pub_date = scrapy.Field()
   access_info = scrapy.Field()

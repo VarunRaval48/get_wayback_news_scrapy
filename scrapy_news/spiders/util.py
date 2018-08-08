@@ -77,8 +77,11 @@ class PrintingThread(threading.Thread):
 def print_thread(msg, error=False, debug=True):
   time = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
   if error:
-    p_msg = '\nERROR\n{}: {}\n'.format(time, msg)
-    print(p_msg)
+    p_msg = 'ERROR_{}: {}'.format(time, msg)
+  else:
+    p_msg = 'DEBUG_{}: {}'.format(time, msg)
+
+  print(p_msg)
 
 
 if __name__ == '__main__':
