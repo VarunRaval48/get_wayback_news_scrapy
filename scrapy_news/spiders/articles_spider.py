@@ -80,6 +80,7 @@ class NytimesSpider(scrapy.Spider):
   def parse(self, response):
     url = response.request.url
     r_url = response.url
+    r_url = r_url.split("?")[0]
     snap = get_snapshot_number(r_url)
     addr = get_page_addr(r_url, self.access_info.domain_name)
 
