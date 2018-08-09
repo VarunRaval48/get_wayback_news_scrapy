@@ -11,6 +11,23 @@ from .wayback_util import get_home_page_urls, get_unique_addr, is_url_proper
 from .newssite_util import nytimes_page_info, save_article, AccessInfo, nytimes_url
 from ..items import PageItem
 
+headers = {
+    'DNT':
+    '1',
+    'Accept-Encoding':
+    'gzip, deflate',
+    'Accept-Language':
+    'en-US,en;q=0.8',
+    'Upgrade-Insecure-Requests':
+    '1',
+    'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
+    'Accept':
+    'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Connection':
+    'keep-alive',
+}
+
 
 # dir_name given without last slash
 class NytimesSpider(scrapy.Spider):
@@ -55,10 +72,10 @@ class NytimesSpider(scrapy.Spider):
     home_pages = get_home_page_urls(self.access_info)
     print(home_pages)
     for snap, urls in home_pages.items():
-      u_addr = get_unique_addr(snap, '')
-      if u_addr not in self.state['seen_pages']:
-        self.state['seen_pages'].add(u_addr)
-        yield scrapy.Request(url=urls[-1], callback=self.parse)
+      for url in urls:
+        self.state['seen_pages'].add(
+            get_unique_addr(get_snapshot_number(url), ''))
+        yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 
   def parse(self, response):
     url = response.request.url
@@ -69,7 +86,11 @@ class NytimesSpider(scrapy.Spider):
     # print(snap)
     if is_url_proper(url, r_url, self.access_info):
       if url != r_url:
-        self.state['seen_pages'].add(get_unique_addr(snap[:8], addr))
+        u_addr = get_unique_addr(snap, addr)
+        if u_addr in self.state['seen_pages']:
+          return
+
+        self.state['seen_pages'].add(u_addr)
 
       page = response.body.decode('utf-8', 'ignore')
       soup, is_proper_page, pub_date_home, is_article, page_type, pub_date = \
@@ -122,7 +143,7 @@ class NytimesSpider(scrapy.Spider):
             continue
 
           if addr is not None:
-            u_addr = get_unique_addr(snap_new[:8], addr)
+            u_addr = get_unique_addr(snap_new, addr)
 
           # check whether url is in the set using page specific url name
           if addr is None or u_addr in self.state['seen_pages']:
@@ -131,4 +152,4 @@ class NytimesSpider(scrapy.Spider):
           # print(u_addr)
 
           self.state['seen_pages'].add(u_addr)
-          yield scrapy.Request(href, callback=self.parse)
+          yield scrapy.Request(href, headers=headers, callback=self.parse)
