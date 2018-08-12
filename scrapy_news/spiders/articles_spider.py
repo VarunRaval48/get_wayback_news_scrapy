@@ -34,6 +34,8 @@ class NytimesSpider(scrapy.Spider):
   name = "articles"
   rotate_user_agent = True
 
+  handle_httpstatus_list = [404]
+
   url, domain_name = "http://www.nytimes.com/", "nytimes.com"
 
   def __init__(self,
@@ -83,6 +85,10 @@ class NytimesSpider(scrapy.Spider):
     snap = get_snapshot_number(r_url)
     addr = get_page_addr(r_url, self.access_info.domain_name)
 
+    if (response.status == 404):
+      r_url = r_url.split("?")[0]
+      return scrapy.Request(url=r_url, headers=headers, callback=self.parse)
+
     # print(snap)
     if is_url_proper(url, r_url, self.access_info):
       if url != r_url:
@@ -125,7 +131,7 @@ class NytimesSpider(scrapy.Spider):
 
         for a_tag in all_as:
           href = str(a_tag['href'])
-          href = href.split("?")[0]
+          # href = href.split("?")[0]
 
           if not self.access_info.check_url(href):
             continue
