@@ -5,7 +5,7 @@
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-from random import choice
+from random import choice, uniform
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
 
@@ -143,5 +143,5 @@ class ConnectionRefusedRetryMiddleware(RetryMiddleware):
   def process_exception(self, request, exception, spider):
     if type(exception) == ConnectionRefusedError:
       spider.logger.error('ConnectionRefusedError on {}'.format(request.url))
-      time.sleep(10)
+      time.sleep(uniform(5, 10))
       return self._retry(request, exception, spider)
