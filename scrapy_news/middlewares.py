@@ -9,6 +9,11 @@ from random import choice
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
 
+import time
+
+from scrapy.downloadermiddlewares.retry import RetryMiddleware
+from twisted.internet.error import ConnectionRefusedError
+
 
 class ScrapyNewsSpiderMiddleware(object):
   # Not all methods need to be defined. If a method is not defined,
@@ -132,3 +137,11 @@ class RotateUserAgentMiddleware(object):
       return
 
     request.headers['user-agent'] = choice(self.user_agents)
+
+
+class ConnectionRefusedRetryMiddleware(RetryMiddleware):
+  def process_exception(self, request, exception, spider):
+    if type(exception) == ConnectionRefusedError:
+      spider.logger.error('ConnectionRefusedError on {}'.format(request.url))
+      time.sleep(10)
+      return self._retry(request, exception, spider)

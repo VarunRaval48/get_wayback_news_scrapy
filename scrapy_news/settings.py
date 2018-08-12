@@ -21,12 +21,12 @@ NEWSPIDER_MODULE = 'scrapy_news.spiders'
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 10
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 5
+DOWNLOAD_DELAY = 0.35
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -55,9 +55,10 @@ COOKIES_ENABLED = False
 #    'scrapy_news.middlewares.ScrapyNewsDownloaderMiddleware': 543,
 #}
 DOWNLOADER_MIDDLEWARES = {
-    'scrapy_news.middlewares.RotateUserAgentMiddleware': 110,
-    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
-    'rotating_proxies.middlewares.BanDetectionMiddleware': 620
+    'scrapy_news.middlewares.RotateUserAgentMiddleware': 501,
+    'scrapy_news.middlewares.ConnectionRefusedRetryMiddleware': 551
+    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620
 }
 
 # Enable or disable extensions
@@ -79,12 +80,12 @@ ITEM_PIPELINES = {
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-AUTOTHROTTLE_START_DELAY = 1
+AUTOTHROTTLE_START_DELAY = 10
 # The maximum download delay to be set in case of high latencies
 AUTOTHROTTLE_MAX_DELAY = 120
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-AUTOTHROTTLE_TARGET_CONCURRENCY = 50
+AUTOTHROTTLE_TARGET_CONCURRENCY = 10
 # Enable showing throttling stats for every response received:
 AUTOTHROTTLE_DEBUG = False
 
@@ -103,9 +104,9 @@ DEPTH_PRIORITY = -1
 
 REACTOR_THREADPOOL_MAXSIZE = 20
 
-ROTATING_PROXY_PATH = './proxy_1.txt'
+ROTATING_PROXY_PATH = './proxies_1.txt'
 
-user_agent_list = [
+USER_AGENT_CHOICES = [
     "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
     "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
     "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",
