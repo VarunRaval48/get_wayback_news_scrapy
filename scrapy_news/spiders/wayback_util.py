@@ -1,5 +1,6 @@
 import json
 
+import urllib
 from urllib.request import urlopen
 from urllib import error
 
@@ -43,6 +44,9 @@ def traverse_calendar(data, access_info):
         if seen_days >= access_info.no_days:
           return id_dict
 
+proxy_support = urllib.request.ProxyHandler({'https' : '185.93.3.70:8080'})
+opener = urllib.request.build_opener(proxy_support)
+urllib.request.install_opener(opener)
 
 def get_home_page_urls(access_info):
   main_url = "https://web.archive.org/__wb/calendarcaptures?url={}&selected_year={}".format(
