@@ -144,15 +144,24 @@ def nytimes_page_info(page, url):
   # if it is an article, find publication date, if publication date is not found,
   # it is not article
   if is_article:
-    time_tag = soup.find('div', class_='timestamp')
-    if time_tag is not None:
-      date = time_tag.string.split(":")[-1].strip()
+    meta_pud_tag = soup.find('meta', attrs={'name': 'PUD'})
+    if meta_pud_tag is not None:
       try:
-        pub_date = datetime.strptime(date, '%B %d, %Y')
-        pub_date = int(datetime.strftime(pub_date, '%Y%m%d'))
-      except ValueError as e:
-        print_thread('error parsing date {}'.format(e), error=True)
+        pub_date = int(meta_pud_tag['content'])
+      except:
         pub_date = None
+        pass
+
+    if pub_date is None:
+      time_tag = soup.find('div', class_='timestamp')
+      if time_tag is not None:
+        date = time_tag.string.split(":")[-1].strip()
+        try:
+          pub_date = datetime.strptime(date, '%B %d, %Y')
+          pub_date = int(datetime.strftime(pub_date, '%Y%m%d'))
+        except ValueError as e:
+          print_thread('error parsing date {}'.format(e), error=True)
+          pub_date = None
 
     # make another try
     if pub_date is None:
