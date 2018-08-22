@@ -143,5 +143,5 @@ class ConnectionRefusedRetryMiddleware(RetryMiddleware):
   def process_exception(self, request, exception, spider):
     if type(exception) == ConnectionRefusedError:
       spider.logger.error('ConnectionRefusedError on {}'.format(request.url))
-      time.sleep(uniform(5, 10))
+      time.sleep(uniform(3, 6))
       return self._retry(request, exception, spider)

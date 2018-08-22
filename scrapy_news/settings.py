@@ -32,7 +32,7 @@ DOWNLOAD_DELAY = 0.35
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -57,8 +57,8 @@ COOKIES_ENABLED = False
 DOWNLOADER_MIDDLEWARES = {
     'scrapy_news.middlewares.RotateUserAgentMiddleware': 501,
     'scrapy_news.middlewares.ConnectionRefusedRetryMiddleware': 551
-    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
-    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620
+    #'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    #'rotating_proxies.middlewares.BanDetectionMiddleware': 620
 }
 
 # Enable or disable extensions
@@ -78,7 +78,7 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
-AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_ENABLED = False
 # The initial download delay
 AUTOTHROTTLE_START_DELAY = 10
 # The maximum download delay to be set in case of high latencies
